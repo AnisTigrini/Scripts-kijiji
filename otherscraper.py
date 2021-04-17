@@ -1,31 +1,10 @@
 # Web scraper for kijiji auto
 # 1 Necessary imports
+from platform import version
+from mysql.connector.errors import Error
 from selenium import webdriver
-import random
 import mysql.connector
 import time
-
-# Function to create a random user
-def randomUser():
-    mydict = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o'
-    'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-
-    num = 0
-    mydictlen = len(mydict) - 1
-    imageProfil = "https://cdn.dribbble.com/users/5642965/screenshots/12675462/profile_picture_4x.jpg"
-    useremail = ""
-    unserfirstname = "Boby"
-    userlastname = "Johnson"
-    datebirth = "1995-02-01"
-    pw = "boby"
-
-    while num < 7:
-        useremail += random.randint(0, mydictlen)
-
-    useremail += "@gmail.com"
-
-    return (useremail, unserfirstname, userlastname, datebirth, pw, imageProfil)
-
 
 # 2 Open the chromedriver and set the current height of the window
 driver = webdriver.Chrome("chromedriver")
@@ -37,13 +16,21 @@ connection = mysql.connector.connect(host='127.0.0.1',
                              charset='utf8mb4')
 
 mycursor = connection.cursor()
-
+vehicleIdFileWrite = open('vehicle.txt', 'a')
 
 for vid in open("vehicleID.txt").readlines():
     driver.get('https://www.kijijiautos.ca/fr/voitures/#vip={}'.format(vid))
     
     #2.1 Some variable we will need
     idPost = vid
+    if ("\n") in idPost:
+        idPost = idPost.strip("\n")
+    if ("\r") in idPost:
+        idPost = idPost.strip("\r")
+    if ("\t") in idPost:
+        idPost = idPost.strip("\t")
+    if (" ") in idPost:
+        idPost = idPost.strip(" ")
     title = None
     price = None
     description = None
@@ -211,4 +198,11 @@ for vid in open("vehicleID.txt").readlines():
     except:
         print('Error on getting the equipment')
 
+
+    try:
+        if title != None and price != None and description != None and len(imageLinks) >= 3:
+            mycursor.execute("CALL entrerPost('{}', '{}', '{}', {}, '{}', '{}', {}, '{}', '{}', '{}', '{}', '{}', '{}', '{}', {}, '{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(idPost, "philippefortin@gmail.com", title, price, description, state, kilos, "-", transmission, "-", gaz, carType, brand, model, year,imageLinks[0], imageLinks[1], imageLinks[2], "bluetooth", "AC", "radio", "telephone"))
+
+    except Error as e:
+        print(e)
 driver.close()
