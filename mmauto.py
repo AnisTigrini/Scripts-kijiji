@@ -7,7 +7,7 @@ import time
 driver = webdriver.Chrome("chromedriver")
 connection = mysql.connector.connect(host='127.0.0.1',
                              user='root',
-                             password='4991',
+                             password='****',
                              database='jikiki',
                              charset='utf8mb4')
 
