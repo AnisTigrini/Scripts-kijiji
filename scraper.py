@@ -2,7 +2,6 @@
 
 # 1 Necessary imports
 from selenium import webdriver
-import mysql.connector
 import time
 
 # 2 Open the chromedriver and set the current height of the window
